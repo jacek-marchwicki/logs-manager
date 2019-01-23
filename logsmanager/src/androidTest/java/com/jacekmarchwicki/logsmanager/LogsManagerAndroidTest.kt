@@ -93,7 +93,7 @@ class LogsManagerAndroidTest {
         val entries = logsManager.getEntries()
         assertEquals(1, entries.size)
         val entry = entries[0]
-        assertEquals("title", entry.title)
+        assertEquals("updated title", entry.title)
         assertEquals(Log.WARN, entry.level)
         val details = logsManager.getDetails(entry.id)
         assertNotNull(details)
@@ -104,7 +104,7 @@ class LogsManagerAndroidTest {
 
     @Test
     fun whenUpdateLogInstantMessageWithToLowLevel_itIsNotLogged() {
-        val id = logsManager.logInstant(Log.DEBUG, "title", "details")
+        val id = logsManager.logInstant(Log.VERBOSE, "title", "details")
 
         logsManager.updateLogInstant(id) {
             it.copy(level = Log.WARN, title = "updated ${it.title}", details = "updated ${it.details}")
