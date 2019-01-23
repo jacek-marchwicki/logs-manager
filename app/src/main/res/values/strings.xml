@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">LogsManagerExample</string>
+    <string name="app_main_activity_header">Hello World!</string>
+    <string name="app_main_activity_do_request_button">Execute request</string>
+</resources>
