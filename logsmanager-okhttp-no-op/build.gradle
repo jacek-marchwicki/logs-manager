@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion 28
 
-    resourcePrefix 'logsmaanger_'
+    resourcePrefix 'logsmanger_'
 
     defaultConfig {
         minSdkVersion 15
@@ -26,6 +26,7 @@ android {
 
 dependencies {
     implementation project(":logsmanager-base")
+    implementation "com.squareup.okhttp3:okhttp:3.12.1"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     testImplementation 'junit:junit:4.12'

@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.example.logsmanager
+package com.jacekmarchwicki.logsmanager
 
-import com.jacekmarchwicki.logsmanager.LogsManager
 import okhttp3.Interceptor
 import okhttp3.Response
 

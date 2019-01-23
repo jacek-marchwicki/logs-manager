@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion 28
 
-    resourcePrefix 'logsmaanger_'
+    resourcePrefix 'logsmanger_'
 
     defaultConfig {
         minSdkVersion 15

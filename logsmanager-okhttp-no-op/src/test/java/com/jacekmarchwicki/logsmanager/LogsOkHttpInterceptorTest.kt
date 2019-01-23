@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.example.logsmanager
+package com.jacekmarchwicki.logsmanager
 
 import android.util.Log
 import com.jacekmarchwicki.logsmanager.LogsManager
+import com.jacekmarchwicki.logsmanager.LogsOkHttpInterceptor
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verifyZeroInteractions
 import okhttp3.OkHttpClient
