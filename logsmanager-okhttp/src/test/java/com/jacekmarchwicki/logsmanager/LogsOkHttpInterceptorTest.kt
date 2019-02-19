@@ -23,7 +23,7 @@ import okhttp3.Response
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.SocketPolicy
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.CoreMatchers.containsString
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThat
 import org.junit.Before

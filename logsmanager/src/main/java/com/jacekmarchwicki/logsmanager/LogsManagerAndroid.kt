@@ -28,7 +28,11 @@ import android.os.Build
 import android.support.v4.app.NotificationCompat
 import com.jacekmarchwicki.logsmanager.internal.LogsActivity
 import java.util.Locale
-import java.util.concurrent.*
+import java.util.concurrent.Executor
+import java.util.concurrent.ThreadFactory
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicInteger
 
 private fun defaultThreadPool(): Executor = ThreadPoolExecutor(
@@ -171,7 +175,6 @@ class LogsManagerAndroid(internal val settings: LogsManagerAndroidSettings, priv
                 .setAutoCancel(false)
                 .build()
         notificationManger.notify(789123, notification)
-
     }
 
     init {
@@ -208,7 +211,6 @@ class LogsManagerAndroid(internal val settings: LogsManagerAndroidSettings, priv
     internal fun clear() {
         dbHelper.clear()
     }
-
 }
 
 private fun <T> Cursor.toList(map: (Cursor) -> T): List<T> {

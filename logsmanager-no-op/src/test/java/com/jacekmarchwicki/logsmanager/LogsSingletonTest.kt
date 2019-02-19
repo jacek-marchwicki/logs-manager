@@ -46,7 +46,7 @@ class LogsSingletonTest {
 
     @Test
     fun `setup always succeed`() {
-        LogsSingleton.setup(mock {  })
-        LogsSingleton.setup(mock {  })
+        LogsSingleton.setup(mock { })
+        LogsSingleton.setup(mock { })
     }
 }

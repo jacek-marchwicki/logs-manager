@@ -211,7 +211,6 @@ class LogsOkHttpInterceptor constructor(private val logsManager: LogsManager, pr
             } catch (e: EOFException) {
                 return false // Truncated UTF-8 sequence.
             }
-
         }
     }
 }

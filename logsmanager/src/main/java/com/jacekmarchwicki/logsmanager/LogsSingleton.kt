@@ -16,7 +16,6 @@
 package com.jacekmarchwicki.logsmanager
 
 import android.annotation.SuppressLint
-import android.content.Context
 
 object LogsSingleton : LogsSingletonBase {
     override fun checkLevel(level: Int): Boolean = instance.checkLevel(level)
@@ -30,5 +29,4 @@ object LogsSingleton : LogsSingletonBase {
     override fun setup(logsManager: LogsManager) {
         instance = logsManager
     }
-
 }

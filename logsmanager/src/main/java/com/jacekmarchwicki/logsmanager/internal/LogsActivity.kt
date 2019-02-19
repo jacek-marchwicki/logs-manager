@@ -72,7 +72,6 @@ internal class LogsActivity : AppCompatActivity() {
     data class ShortEntryItem(val shortEntry: LogsManagerAndroid.ShortEntry) :
         KotlinBaseAdapterItem<Long> {
         override val itemId: Long = shortEntry.id
-
     }
 
     class ShortEntryViewHolderManager : ViewHolderManager {

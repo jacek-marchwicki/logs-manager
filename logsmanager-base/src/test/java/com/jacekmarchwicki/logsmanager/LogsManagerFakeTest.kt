@@ -22,7 +22,7 @@ import org.junit.Test
 
 class LogsManagerFakeTest {
 
-    private val logsManager =  LogsManagerFake(Log.DEBUG)
+    private val logsManager = LogsManagerFake(Log.DEBUG)
 
     @Test
     fun `when log data, it is present in fake`() {
@@ -71,5 +71,4 @@ class LogsManagerFakeTest {
 
         assertEquals(listOf<LogsManager.EntryLevelData>(), logsManager.logs)
     }
-
 }

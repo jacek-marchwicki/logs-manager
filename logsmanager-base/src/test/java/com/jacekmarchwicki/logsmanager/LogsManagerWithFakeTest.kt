@@ -17,10 +17,8 @@
 package com.jacekmarchwicki.logsmanager
 
 import android.util.Log
-import com.nhaarman.mockito_kotlin.*
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.io.IOException
 
 class LogsManagerWithFakeTest {
 

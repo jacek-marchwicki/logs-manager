@@ -17,15 +17,23 @@
 package com.jacekmarchwicki.logsmanager
 
 import android.util.Log
-import com.nhaarman.mockito_kotlin.*
-import org.junit.Assert.*
 import org.junit.Test
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.argThat
+import com.nhaarman.mockito_kotlin.doReturn
+import com.nhaarman.mockito_kotlin.eq
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.stub
+import com.nhaarman.mockito_kotlin.verify
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import java.io.IOException
 
 class LogsManagerTest {
 
     private val logsManager: LogsManager = mock {
-        on { checkLevel(any())} doReturn true
+        on { checkLevel(any()) } doReturn true
     }
 
     @Test
@@ -97,7 +105,7 @@ class LogsManagerTest {
 
     @Test
     fun `when log as a function, execute log`() {
-        logsManager.log(Log.VERBOSE, {"title"}, {"details"})
+        logsManager.log(Log.VERBOSE, { "title" }, { "details" })
 
         verify(logsManager).log(Log.VERBOSE, "title", "details")
     }

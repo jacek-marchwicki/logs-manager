@@ -49,7 +49,7 @@ class LogsSingletonInstrumentationTest {
 
     @Test
     fun setup_alwaysSucceed() {
-        LogsSingleton.setup(mock {  })
-        LogsSingleton.setup(mock {  })
+        LogsSingleton.setup(mock { })
+        LogsSingleton.setup(mock { })
     }
 }

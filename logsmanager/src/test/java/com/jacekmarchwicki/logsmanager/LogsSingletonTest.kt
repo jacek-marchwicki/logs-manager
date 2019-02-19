@@ -17,8 +17,15 @@
 package com.jacekmarchwicki.logsmanager
 
 import android.util.Log
-import com.nhaarman.mockito_kotlin.*
-import org.junit.Assert.*
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.doAnswer
+import com.nhaarman.mockito_kotlin.doReturn
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.stub
+import com.nhaarman.mockito_kotlin.verify
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 

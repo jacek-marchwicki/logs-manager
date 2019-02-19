@@ -24,7 +24,8 @@ import com.jacekmarchwicki.logsmanager.LogsOkHttpInterceptor
 import com.jacekmarchwicki.logsmanager.LogsSingleton
 import com.jacekmarchwicki.logsmanager.log
 import kotlinx.android.synthetic.main.main_activity.*
-import okhttp3.*
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.io.IOException
 
 @SuppressLint("SetTextI18n")
@@ -39,7 +40,6 @@ class MainActivity : AppCompatActivity() {
         app_main_activity_do_request_button.setOnClickListener {
             doRequest()
         }
-
     }
 
     private fun doRequest() {
@@ -66,7 +66,5 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }.start()
-
-
     }
 }

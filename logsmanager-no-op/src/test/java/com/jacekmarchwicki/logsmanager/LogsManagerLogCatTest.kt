@@ -22,7 +22,7 @@ import org.junit.Test
 
 class LogsManagerLogCatTest {
 
-    private val logsManager  = LogsManagerLogCat(Log.WARN)
+    private val logsManager = LogsManagerLogCat(Log.WARN)
 
     @Test
     fun `checkLevel always return false`() {
@@ -44,5 +44,4 @@ class LogsManagerLogCatTest {
         val ret = logsManager.logInstant(Log.VERBOSE, "title", "details")
         logsManager.updateLogInstant(ret) { it.copy(title = "new title") }
     }
-
 }

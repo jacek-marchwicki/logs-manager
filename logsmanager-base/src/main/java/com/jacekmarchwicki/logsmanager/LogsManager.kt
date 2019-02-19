@@ -29,7 +29,6 @@ interface LogsManager {
     fun log(level: Int, title: String, details: String)
     fun logInstant(level: Int, title: String, details: String): Long
     fun updateLogInstant(id: Long, update: (EntryLevelData) -> EntryLevelData)
-
 }
 
 inline fun <T> LogsManager.logFailure(

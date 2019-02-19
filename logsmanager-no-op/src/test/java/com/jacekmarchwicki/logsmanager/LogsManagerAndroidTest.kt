@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- package com.jacekmarchwicki.logsmanager
+package com.jacekmarchwicki.logsmanager
 
 import android.util.Log
 import com.nhaarman.mockito_kotlin.mock
@@ -23,7 +23,7 @@ import org.junit.Test
 
 class LogsManagerAndroidTest {
 
-    private val logsManager  = LogsManagerAndroid(LogsManagerAndroidSettings(mock {  }, Log.WARN))
+    private val logsManager = LogsManagerAndroid(LogsManagerAndroidSettings(mock { }, Log.WARN))
 
     @Test
     fun `checkLevel always return false`() {
@@ -45,5 +45,4 @@ class LogsManagerAndroidTest {
         val ret = logsManager.logInstant(Log.VERBOSE, "title", "details")
         logsManager.updateLogInstant(ret) { it.copy(title = "new title") }
     }
-
 }

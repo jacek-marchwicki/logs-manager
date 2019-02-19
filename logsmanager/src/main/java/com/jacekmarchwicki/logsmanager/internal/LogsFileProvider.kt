@@ -46,5 +46,4 @@ internal class LogsFileProvider : FileProvider() {
             }.joinToString(separator = "")
         }
     }
-
 }
