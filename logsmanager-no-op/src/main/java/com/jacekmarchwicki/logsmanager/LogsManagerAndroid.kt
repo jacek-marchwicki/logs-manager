@@ -17,12 +17,15 @@
 
 package com.jacekmarchwicki.logsmanager
 
+import com.jacekmarchwicki.logsmanager.internal.RemovableInRelease
 import java.util.concurrent.Executor
 
+@RemovableInRelease
 private object DirectExecutor : Executor {
     override fun execute(command: Runnable) = command.run()
 }
 
 private fun defaultThreadPool(): Executor = DirectExecutor
 
+@RemovableInRelease
 class LogsManagerAndroid(private val settings: LogsManagerAndroidSettings, private val executor: Executor = defaultThreadPool())  : LogsManager, NoOpLogsManager

@@ -16,6 +16,9 @@
 
 package com.jacekmarchwicki.logsmanager
 
+import com.jacekmarchwicki.logsmanager.internal.RemovableInRelease
+
+@RemovableInRelease
 internal interface NoOpLogsManager : LogsManager {
     override fun checkLevel(level: Int): Boolean = false
     override fun log(level: Int, title: String, details: String) = Unit

@@ -15,6 +15,9 @@
  */
 package com.jacekmarchwicki.logsmanager
 
+import com.jacekmarchwicki.logsmanager.internal.RemovableInRelease
+
+@RemovableInRelease
 object LogsSingleton : LogsSingletonBase, NoOpLogsManager {
     override fun setup(logsManager: LogsManager) = Unit
 }

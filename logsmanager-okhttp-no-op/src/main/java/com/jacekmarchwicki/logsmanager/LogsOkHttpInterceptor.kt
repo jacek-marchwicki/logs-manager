@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("unused")
+
 package com.jacekmarchwicki.logsmanager
 
 import okhttp3.Interceptor

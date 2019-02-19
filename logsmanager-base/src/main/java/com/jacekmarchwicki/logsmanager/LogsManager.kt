@@ -15,9 +15,11 @@
  */
 package com.jacekmarchwicki.logsmanager
 
+import com.jacekmarchwicki.logsmanager.internal.RemovableInRelease
 import java.io.PrintWriter
 import java.io.StringWriter
 
+@RemovableInRelease
 interface LogsManager {
     data class EntryData(val title: String, val details: String)
     data class EntryLevelData(val level: Int, val title: String, val details: String)
@@ -52,12 +54,15 @@ inline fun <T> LogsManager.logFailure(
     }
 }
 
+@RemovableInRelease
 @Suppress("NOTHING_TO_INLINE")
 inline fun LogsManager.setSeverityInstant(id: Long, level: Int) = updateLogInstant(id) { it.copy(level = level) }
 
+@RemovableInRelease
 @Suppress("NOTHING_TO_INLINE")
 inline fun LogsManager.appendLogInstant(id: Long, moreDetails: String) = updateLogInstant(id) { it.copy(details = it.details + moreDetails) }
 
+@RemovableInRelease
 @Suppress("NOTHING_TO_INLINE")
 inline fun LogsManager.log(level: Int, message: String, throwable: Throwable) {
     if (checkLevel(level)) {
@@ -65,23 +70,27 @@ inline fun LogsManager.log(level: Int, message: String, throwable: Throwable) {
     }
 }
 
+@RemovableInRelease
 @Suppress("NOTHING_TO_INLINE")
 inline fun Throwable.printStackTraceString(): String = StringWriter().use {
     PrintWriter(it).use { printStackTrace(it) }
     it.toString()
 }
 
+@RemovableInRelease
 @Suppress("NOTHING_TO_INLINE")
 inline fun LogsManager.log(level: Int, title: String) {
     log(level, title, title)
 }
 
+@RemovableInRelease
 inline fun LogsManager.log(level: Int, title: () -> String, details: () -> String) {
     if (checkLevel(level)) {
         log(level, title(), details())
     }
 }
 
+@RemovableInRelease
 inline fun LogsManager.logEntry(level: Int, entryData: () -> LogsManager.EntryData) {
     if (checkLevel(level)) {
         val data = entryData()
@@ -89,6 +98,7 @@ inline fun LogsManager.logEntry(level: Int, entryData: () -> LogsManager.EntryDa
     }
 }
 
+@RemovableInRelease
 inline fun LogsManager.logPair(level: Int, entryData: () -> Pair<String, String>) {
     if (checkLevel(level)) {
         val data = entryData()
@@ -96,6 +106,7 @@ inline fun LogsManager.logPair(level: Int, entryData: () -> Pair<String, String>
     }
 }
 
+@RemovableInRelease
 inline fun LogsManager.logTitle(level: Int, title: () -> String) {
     if (checkLevel(level)) {
         val text = title()

@@ -17,4 +17,7 @@
 
 package com.jacekmarchwicki.logsmanager
 
+import com.jacekmarchwicki.logsmanager.internal.RemovableInRelease
+
+@RemovableInRelease
 class LogsManagerLogCat(private val logLevelEnabled: Int) : LogsManager, NoOpLogsManager
