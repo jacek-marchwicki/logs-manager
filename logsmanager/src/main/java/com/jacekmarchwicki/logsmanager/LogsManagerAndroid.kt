@@ -47,11 +47,13 @@ class LogsManagerAndroid(internal val settings: LogsManagerAndroidSettings, priv
     data class ShortEntry(val id: Long, val timeInMillis: Long, val level: Int, val title: String)
     data class FullEntry(val id: Long, val timeInMillis: Long, val level: Int, val title: String, val details: String)
 
-    private class DBHelper(context: Context) : SQLiteOpenHelper(context, "Logs", null, 3) {
+    private class DBHelper(context: Context) : SQLiteOpenHelper(context, "Logs", null, 4) {
         override fun onCreate(db: SQLiteDatabase) {
             db.execSQL("CREATE TABLE logs (id INTEGER PRIMARY KEY, timeInMillis INTEGER, level INTEGER, title TEXT, details BLOB)")
+            db.execSQL("CREATE INDEX logs_time_index ON logs ( timeInMillis )")
         }
         override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+            db.execSQL("DROP INDEX IF EXISTS logs_time_index")
             db.execSQL("DROP TABLE IF EXISTS logs")
             onCreate(db)
         }
