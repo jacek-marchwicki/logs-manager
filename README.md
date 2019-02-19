@@ -1,5 +1,7 @@
 # Logger in notification window
 
+[![](https://jitpack.io/v/jacek-marchwicki/logs-manager.svg)](https://jitpack.io/#jacek-marchwicki/logs-manager)
+
 LogsManager is simple and powerfull logger that allows display all logs from your application by simply tapping on its notification.
 
 --- Video here
@@ -19,11 +21,18 @@ LogsManager is simple and powerfull logger that allows display all logs from you
 Configure dependencies:
 
 ```groovy
+repositories {
+    maven { url "https://jitpack.io" }
+}
+```
+
+```groovy
 dependencies {
-    debugImplementation project(":logsmanager")
-    releaseImplementation project(':logsmanager-no-op')
-    debugImplementation project(":logsmanager-okhttp")
-    releaseImplementation project(':logsmanager-okhttp-no-op')
+    debugImplementation "com.github.jacek-marchwicki.logs-manager:logsmanager:<look-on-release-tab>"
+    releaseImplementation "com.github.jacek-marchwicki.logs-manager:logsmanager-no-op:<look-on-release-tab>"
+
+    debugImplementation "com.github.jacek-marchwicki.logs-manager:logsmanager-okhttp:<look-on-release-tab>"
+    releaseImplementation "com.github.jacek-marchwicki.logs-manager:logsmanager-okhttp-no-op:<look-on-release-tab>"
 }
 ```
 
