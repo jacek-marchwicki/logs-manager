@@ -21,7 +21,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            consumerProguardFiles 'proguard-rules.pro'
+        }
         release {
+            consumerProguardFiles 'proguard-rules.pro'
             minifyEnabled false
         }
     }
@@ -32,6 +36,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     testImplementation 'junit:junit:4.12'
-    testImplementation 'org.mockito:mockito-core:2.8.9'
+    testImplementation 'org.mockito:mockito-core:2.23.0'
     testImplementation 'com.nhaarman:mockito-kotlin:1.5.0'
 }
