@@ -26,13 +26,6 @@ class MainApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        LogsSingleton.setup(
-            LogsManagerAndroid(
-                LogsManagerAndroidSettings(
-                    this,
-                    Log.VERBOSE
-                )
-            )
-        )
+        LogsSingleton.setup(LogsManagerAndroid(LogsManagerAndroidSettings(this, Log.VERBOSE)))
     }
 }
