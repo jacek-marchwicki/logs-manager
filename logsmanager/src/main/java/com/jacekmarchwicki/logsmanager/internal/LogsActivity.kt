@@ -18,7 +18,10 @@ package com.jacekmarchwicki.logsmanager.internal
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.support.v4.widget.ContentLoadingProgressBar
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -126,21 +129,16 @@ internal class LogsActivity : AppCompatActivity() {
             }
             this.adapter = adapter
         }
-        loadData(adapter)
+        loadData(adapter, withProgress = true)
         toolbar.setNavigationIcon(R.drawable.logsmanager_close)
         toolbar.setNavigationOnClickListener {
             finish()
         }
         toolbar.title = logsManager.settings.notificationTitle
-        toolbar.menu.add("Refresh")
-            .setOnMenuItemClickListener {
-                loadData(adapter)
-                true
-            }
         toolbar.menu.add("Clear")
             .setOnMenuItemClickListener {
                 logsManager.clear()
-                loadData(adapter)
+                loadData(adapter, withProgress = true)
                 true
             }
         toolbar.menu.add("Send logs")
@@ -148,6 +146,10 @@ internal class LogsActivity : AppCompatActivity() {
                 LogsHelper.sendLogs(this, ::allEntities)
                 true
             }
+        val refresh: SwipeRefreshLayout = findViewById(R.id.logs_activity_refresh)
+        refresh.setOnRefreshListener {
+            loadData(adapter, withProgress = false)
+        }
     }
 
     private fun allEntities(writer: OutputStreamWriter) {
@@ -164,15 +166,44 @@ internal class LogsActivity : AppCompatActivity() {
             writer.write("${timeFormat.format(Date(entry.timeInMillis))}, Log level: ${entry.level}\n")
             writer.write(entry.title)
             writer.write("\n")
-            writer.write(logsManager.getDetails(entry.id)?.let { it.details } ?: "LOGGER ERROR")
+            writer.write(logsManager.getDetails(entry.id)?.details ?: "LOGGER ERROR")
             writer.write("\n\n\n")
         }
         writer.write("===== Log End   =====\n")
     }
 
-    private fun loadData(adapter: UniversalAdapter) {
+    private fun loadData(adapter: UniversalAdapter, withProgress: Boolean) {
+        val refresh: SwipeRefreshLayout = findViewById(R.id.logs_activity_refresh)
+        val progress: ContentLoadingProgressBar = findViewById(R.id.logs_activity_progress_bar)
         val toolbar: Toolbar = findViewById(R.id.logs_activity_toolbar)
-        toolbar.subtitle = LogsHelper.timeFormat().format(Date())
-        adapter.call(logsManager.getEntries().map(LogsActivity::ShortEntryItem))
+
+        if (withProgress) {
+            progress.show()
+            adapter.call(listOf())
+            toolbar.subtitle = "Loading..."
+        } else {
+            refresh.isRefreshing = true
+        }
+
+        activityExecute({
+            Date() to logsManager.getEntries().map(LogsActivity::ShortEntryItem)
+        }, { (time, items) ->
+            refresh.isRefreshing = false
+            progress.hide()
+            toolbar.subtitle = LogsHelper.timeFormat().format(time)
+            adapter.call(items)
+        })
     }
+}
+
+private fun <T> Activity.activityExecute(run: () -> T, onResult: (T) -> Unit) {
+    Thread {
+        val result = run()
+        runOnUiThread {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1 || !isDestroyed) {
+                // possible crash on older os versions, but who cares during tests
+                onResult(result)
+            }
+        }
+    }.start()
 }
