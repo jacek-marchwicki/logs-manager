@@ -18,6 +18,12 @@ android {
         }
     }
     signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
         release {
             storeFile file('debug.keystore')
             storePassword 'android'
@@ -28,6 +34,7 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
+            signingConfig signingConfigs.debug
         }
         release {
             minifyEnabled true
