@@ -138,7 +138,6 @@ val fileContent = try {
 
 
 # Todo
-- Test with proguard
 - Check if proguard removes all logging code
 
 # License
