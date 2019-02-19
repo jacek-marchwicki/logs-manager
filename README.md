@@ -58,7 +58,7 @@ val client = OkHttpClient.Builder()
 
 # FAQ
 
-## How I can log?
+## How can I log?
 ```kotlin
 LogSingleton.log(Log.WARN, "A title")
 ```
