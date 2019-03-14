@@ -6,13 +6,13 @@ LogsManager is a simple and powerful logger that allows displaying all logs from
 
 --- Video here
 
-# Reasons for using the LogsManager
+# Reasons for using LogsManager
 1. All HTTP requests will automatically be logged with CURLs and response bodies for later debugging.
 2. All HTTP 4xx/5xx errors will be easily accessible by testers.
 3. In case of failure, you’ll be able to send all logs at once for troubleshooting.
 4. After finding an issue, a tester will send you all logs including all requests and responses.
 5. LogsManager won’t slow down the production version of your app, because there is a no-op version available.
-6. If you as a mobile developer rely on a buggy server you will be able to log “This is not my fault, this is a buggy response from the server, look at issue #1234” note for a tester.
+6. If you as a mobile developer rely on a buggy server, you will be able to log “This is not my fault, this is a buggy response from the server, look at issue #1234” note for your tester.
 7. You and your tester will be able to check if analytics events are correct.
 8. All exceptions that are interesting to see but shouldn’t be displayed to a user can be logged.
 
