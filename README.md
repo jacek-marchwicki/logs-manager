@@ -4,7 +4,7 @@
 
 LogsManager is a simple and powerful logger that allows displaying all logs from your application by simply tapping the notification.
 
---- Video here
+[![Watch the video](doc/video-screen.png)](https://youtu.be/9mxNWzh1jw4)
 
 # Reasons for using LogsManager
 1. All HTTP requests will automatically be logged with CURLs and response bodies for later debugging.
