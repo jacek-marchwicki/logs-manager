@@ -112,6 +112,28 @@ Yes
 LogsSingleton.setup(LogsManagerLogCat(Log.DEBUG))
 ```
 
+## Can I view read logs in tests?
+
+Yes
+
+```kotlin
+val log = LogsManagerStringTest(Log.DEBUG)
+LogsSingleton.setup(log)
+
+log.getEntries()
+```
+
+## Can I use more than one log manager?
+
+Yes
+
+```kotlin
+LogsSingleton.setup(LogsManagerMultiple(listOf(
+  LogsManagerStringTest(Log.DEBUG), 
+  LogsManagerLogCat(Log.WARN)
+)))
+```
+
 
 ## Can I use it in Java?
 

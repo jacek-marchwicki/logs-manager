@@ -20,12 +20,21 @@ import android.app.Application
 import android.util.Log
 import com.jacekmarchwicki.logsmanager.LogsManagerAndroid
 import com.jacekmarchwicki.logsmanager.LogsManagerAndroidSettings
+import com.jacekmarchwicki.logsmanager.LogsManagerLogCat
+import com.jacekmarchwicki.logsmanager.LogsManagerMultiple
 import com.jacekmarchwicki.logsmanager.LogsSingleton
 
 class MainApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        LogsSingleton.setup(LogsManagerAndroid(LogsManagerAndroidSettings(this, Log.VERBOSE)))
+        LogsSingleton.setup(
+            LogsManagerMultiple(
+                listOf(
+                    LogsManagerLogCat(Log.DEBUG),
+                    LogsManagerAndroid(LogsManagerAndroidSettings(this, Log.VERBOSE))
+                )
+            )
+        )
     }
 }
