@@ -62,6 +62,8 @@ class LogsActivityTest {
         )
         LogsSingleton.setup(logsManagerAndroid)
         LogsManagerAndroid.default = logsManagerAndroid
+
+        LogsActivity.executor = IdlingExectutorWrapper(LogsActivity.executor)
     }
 
     @Test
@@ -151,14 +153,11 @@ class LogsActivityTest {
             .perform(click())
         onView(searchView())
             .perform(typeText("Error2\n"))
-        Thread.sleep(2000)
 
         onView(withText("Error1/2")).check(isNotPresented())
         onView(withText("Error2/2")).check(matches(isDisplayed()))
 
         onView(searchViewClose()).perform(click())
-
-        Thread.sleep(2000)
 
         onView(withText("Error1/2")).check(matches(isDisplayed()))
         onView(withText("Error2/2")).check(matches(isDisplayed()))

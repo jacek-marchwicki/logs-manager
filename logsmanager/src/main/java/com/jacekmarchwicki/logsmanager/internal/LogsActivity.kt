@@ -43,6 +43,8 @@ import java.io.OutputStreamWriter
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 internal object LogsHelper {
     fun timeFormat() = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US)
@@ -117,6 +119,10 @@ internal class LogsActivity : AppCompatActivity() {
     private val logsManager = LogsManagerAndroid.default
     private lateinit var searchView: SearchView
     private val searchQuery get() = searchView.query
+
+    companion object {
+        internal var executor: Executor = Executors.newSingleThreadExecutor()
+    }
 
     private val progress: ContentLoadingProgressBar by lazy { findViewById<ContentLoadingProgressBar>(R.id.logs_activity_progress_bar) }
     private val refresh: SwipeRefreshLayout by lazy { findViewById<SwipeRefreshLayout>(R.id.logs_activity_refresh) }
@@ -245,7 +251,7 @@ private fun View.closeKeyboard() {
 }
 
 private fun <T> Activity.activityExecute(run: () -> T, onResult: (T) -> Unit) {
-    Thread {
+    LogsActivity.executor.execute {
         val result = run()
         runOnUiThread {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1 || !isDestroyed) {
@@ -253,5 +259,5 @@ private fun <T> Activity.activityExecute(run: () -> T, onResult: (T) -> Unit) {
                 onResult(result)
             }
         }
-    }.start()
+    }
 }
