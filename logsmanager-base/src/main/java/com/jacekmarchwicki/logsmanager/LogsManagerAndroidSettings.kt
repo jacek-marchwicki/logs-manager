@@ -1,7 +1,8 @@
 package com.jacekmarchwicki.logsmanager
 
 import android.content.Context
+import android.util.Log
 import com.jacekmarchwicki.logsmanager.internal.RemovableInRelease
 
 @RemovableInRelease
-data class LogsManagerAndroidSettings(val context: Context, val logLevelEnabled: Int, val notificationTitle: String = "Logs manager")
+data class LogsManagerAndroidSettings(val context: Context, val logLevelEnabled: Int = Log.VERBOSE, val notificationTitle: String = "Logs manager")

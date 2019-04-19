@@ -48,6 +48,10 @@ private fun defaultThreadPool(): Executor = ThreadPoolExecutor(
 
 class LogsManagerAndroid(internal val settings: LogsManagerAndroidSettings, private val executor: Executor = defaultThreadPool()) : LogsManager {
 
+    companion object {
+        var default: LogsManagerAndroid? = null
+    }
+
     data class ShortEntry(val id: Long, val timeInMillis: Long, val level: Int, val title: String)
     data class FullEntry(val id: Long, val timeInMillis: Long, val level: Int, val title: String, val details: String)
 
@@ -140,8 +144,8 @@ class LogsManagerAndroid(internal val settings: LogsManagerAndroidSettings, priv
 
     private val dbHelper = DBHelper(settings.context)
 
-    internal fun getEntries(): List<ShortEntry> = dbHelper.getEntries()
-    internal fun getDetails(id: Long): FullEntry? = dbHelper.getDetails(id)
+    fun getEntries(): List<ShortEntry> = dbHelper.getEntries()
+    fun getDetails(id: Long): FullEntry? = dbHelper.getDetails(id)
 
     private fun showNotification() {
         val channelId = "debug"
@@ -208,7 +212,7 @@ class LogsManagerAndroid(internal val settings: LogsManagerAndroidSettings, priv
     }
 
     override fun checkLevel(level: Int) = level >= settings.logLevelEnabled
-    internal fun clear() {
+    fun clear() {
         dbHelper.clear()
     }
 }

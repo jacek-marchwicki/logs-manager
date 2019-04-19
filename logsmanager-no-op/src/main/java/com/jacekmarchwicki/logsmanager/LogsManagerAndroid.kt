@@ -28,4 +28,8 @@ private object DirectExecutor : Executor {
 private fun defaultThreadPool(): Executor = DirectExecutor
 
 @RemovableInRelease
-class LogsManagerAndroid(private val settings: LogsManagerAndroidSettings, private val executor: Executor = defaultThreadPool()) : LogsManager, NoOpLogsManager
+class LogsManagerAndroid(private val settings: LogsManagerAndroidSettings, private val executor: Executor = defaultThreadPool()) : LogsManager, NoOpLogsManager {
+    companion object {
+        var default: LogsManagerAndroid? = null
+    }
+}

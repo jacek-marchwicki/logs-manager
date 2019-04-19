@@ -28,11 +28,15 @@ class MainApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        val logsManagerAndroid = LogsManagerAndroid(LogsManagerAndroidSettings(this, Log.VERBOSE))
+        LogsManagerAndroid.default = logsManagerAndroid
+
         LogsSingleton.setup(
             LogsManagerMultiple(
                 listOf(
                     LogsManagerLogCat(Log.DEBUG),
-                    LogsManagerAndroid(LogsManagerAndroidSettings(this, Log.VERBOSE))
+                    logsManagerAndroid
                 )
             )
         )
