@@ -25,14 +25,16 @@ import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.SearchView
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import com.jacekmarchwicki.logsmanager.LogsManagerAndroid
-import com.jacekmarchwicki.logsmanager.LogsSingleton
 import com.jacekmarchwicki.logsmanager.R
 import com.jacekmarchwicki.universaladapter.BaseAdapterItem
 import com.jacekmarchwicki.universaladapter.UniversalAdapter
@@ -65,9 +67,6 @@ internal object LogsHelper {
 }
 
 internal class LogsActivity : AppCompatActivity() {
-
-    private val logsManager =
-        LogsSingleton.instance as? LogsManagerAndroid ?: throw IllegalStateException("logs singleton not set")
 
     data class ShortEntryItem(val shortEntry: LogsManagerAndroid.ShortEntry) :
         KotlinBaseAdapterItem<Long> {
@@ -115,84 +114,134 @@ internal class LogsActivity : AppCompatActivity() {
         }
     }
 
+    private val logsManager = LogsManagerAndroid.default
+    private lateinit var searchView: SearchView
+    private val searchQuery get() = searchView.query
+
+    private val progress: ContentLoadingProgressBar by lazy { findViewById<ContentLoadingProgressBar>(R.id.logs_activity_progress_bar) }
+    private val refresh: SwipeRefreshLayout by lazy { findViewById<SwipeRefreshLayout>(R.id.logs_activity_refresh) }
+    private val toolbar: Toolbar by lazy { findViewById<Toolbar>(R.id.logs_activity_toolbar) }
+    private val recyclerView: RecyclerView by lazy { findViewById<RecyclerView>(R.id.logs_activity_recycler_view) }
+    private val adapter by lazy { UniversalAdapter(listOf(ShortEntryViewHolderManager())) }
+    private val logsManagerNotSet: View by lazy { findViewById<View>(R.id.logsmanager_logs_activity_not_set) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.logsmanager_activity)
 
-        val adapter = UniversalAdapter(listOf(ShortEntryViewHolderManager()))
-        val recyclerView: RecyclerView = findViewById(R.id.logs_activity_recycler_view)
-        val toolbar: Toolbar = findViewById(R.id.logs_activity_toolbar)
         recyclerView.apply {
             layoutManager = LinearLayoutManager(context!!).apply {
                 recycleChildrenOnDetach = true
             }
-            this.adapter = adapter
+            this.adapter = this@LogsActivity.adapter
         }
-        loadData(adapter, withProgress = true)
         toolbar.setNavigationIcon(R.drawable.logsmanager_close)
         toolbar.setNavigationOnClickListener {
             finish()
         }
-        toolbar.title = logsManager.settings.notificationTitle
-        toolbar.menu.add("Clear")
-            .setOnMenuItemClickListener {
-                logsManager.clear()
-                loadData(adapter, withProgress = true)
-                true
+        val logsManager = logsManager
+        toolbar.title = logsManager?.settings?.notificationTitle
+        searchView = SearchView(baseContext)
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(p0: String?): Boolean = true.also {
+                searchView.closeKeyboard()
+                loadData(withProgress = true)
             }
-        toolbar.menu.add("Send logs")
-            .setOnMenuItemClickListener {
-                LogsHelper.sendLogs(this, ::allEntities)
-                true
-            }
+            override fun onQueryTextChange(p0: String?): Boolean = false
+        })
+
+        if (logsManager != null) {
+            toolbar.menu.add("Search")
+                .apply {
+                    setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS or MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW)
+                    actionView = searchView
+                }
+                .setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+                    override fun onMenuItemActionExpand(item: MenuItem?): Boolean = true
+                    override fun onMenuItemActionCollapse(item: MenuItem?): Boolean = true.also {
+                        searchView.setQuery("", false)
+                        searchView.closeKeyboard()
+                        loadData(withProgress = true)
+                    }
+                })
+            toolbar.menu.add("Clear logs")
+                .setOnMenuItemClickListener {
+                    logsManager.clear()
+                    loadData(withProgress = true)
+                    true
+                }
+            toolbar.menu.add("Send logs")
+                .setOnMenuItemClickListener {
+                    LogsHelper.sendLogs(this, ::allEntities)
+                    true
+                }
+        }
         val refresh: SwipeRefreshLayout = findViewById(R.id.logs_activity_refresh)
         refresh.setOnRefreshListener {
-            loadData(adapter, withProgress = false)
+            loadData(withProgress = false)
         }
+        loadData(withProgress = true)
     }
 
     private fun allEntities(writer: OutputStreamWriter) {
         val timeFormat = LogsHelper.timeFormat()
         val date = timeFormat.format(Date())
-        val entities = logsManager.getEntries()
-        writer.write("===== Log Start =====\n")
-        writer.write("Name: ${logsManager.settings.notificationTitle}")
-        writer.write("Now: $date\n")
-        writer.write("Log level: ${logsManager.settings.logLevelEnabled}")
-        writer.write("===== Log Begin =====\n")
-        entities.forEach { entry ->
-            writer.write("===== Log Entry =====\n")
-            writer.write("${timeFormat.format(Date(entry.timeInMillis))}, Log level: ${entry.level}\n")
-            writer.write(entry.title)
-            writer.write("\n")
-            writer.write(logsManager.getDetails(entry.id)?.details ?: "LOGGER ERROR")
-            writer.write("\n\n\n")
-        }
-        writer.write("===== Log End   =====\n")
-    }
-
-    private fun loadData(adapter: UniversalAdapter, withProgress: Boolean) {
-        val refresh: SwipeRefreshLayout = findViewById(R.id.logs_activity_refresh)
-        val progress: ContentLoadingProgressBar = findViewById(R.id.logs_activity_progress_bar)
-        val toolbar: Toolbar = findViewById(R.id.logs_activity_toolbar)
-
-        if (withProgress) {
-            progress.show()
-            adapter.call(listOf())
-            toolbar.subtitle = "Loading..."
+        val logsManager = logsManager
+        if (logsManager == null) {
+            writer.write(getString(R.string.logsmanager_logs_activity_not_set))
         } else {
-            refresh.isRefreshing = true
+            val entities = logsManager.getEntries()
+            writer.write("===== Log Start =====\n")
+            writer.write("Name: ${logsManager.settings.notificationTitle}")
+            writer.write("Now: $date\n")
+            writer.write("Log level: ${logsManager.settings.logLevelEnabled}")
+            writer.write("===== Log Begin =====\n")
+            entities.forEach { entry ->
+                writer.write("===== Log Entry =====\n")
+                writer.write("${timeFormat.format(Date(entry.timeInMillis))}, Log level: ${entry.level}\n")
+                writer.write(entry.title)
+                writer.write("\n")
+                writer.write(logsManager.getDetails(entry.id)?.details ?: "LOGGER ERROR")
+                writer.write("\n\n\n")
+            }
+            writer.write("===== Log End   =====\n")
         }
-
-        activityExecute({
-            Date() to logsManager.getEntries().map(LogsActivity::ShortEntryItem)
-        }, { (time, items) ->
+    }
+    private fun loadData(withProgress: Boolean) {
+        val logsManager = logsManager
+        if (logsManager == null) {
+            logsManagerNotSet.visibility = View.VISIBLE
             refresh.isRefreshing = false
             progress.hide()
-            toolbar.subtitle = LogsHelper.timeFormat().format(time)
-            adapter.call(items)
-        })
+            adapter.call(listOf())
+        } else {
+            logsManagerNotSet.visibility = View.GONE
+
+            if (withProgress) {
+                progress.show()
+                adapter.call(listOf())
+                toolbar.subtitle = "Loading..."
+            } else {
+                refresh.isRefreshing = true
+            }
+
+            activityExecute({
+                Date() to logsManager.getEntries().filter { it.title.contains(searchQuery, ignoreCase = true) }.map(
+                    LogsActivity::ShortEntryItem
+                )
+            }, { (time, items) ->
+                refresh.isRefreshing = false
+                progress.hide()
+                toolbar.subtitle = LogsHelper.timeFormat().format(time)
+                adapter.call(items)
+            })
+        }
     }
+}
+
+private fun View.closeKeyboard() {
+    val imm = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.hideSoftInputFromWindow(windowToken, 0)
 }
 
 private fun <T> Activity.activityExecute(run: () -> T, onResult: (T) -> Unit) {

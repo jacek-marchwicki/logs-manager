@@ -1,2 +1,3 @@
 <resources>
+    <string name="logsmanager_logs_activity_not_set">You need set "LogsManagerAndroid.default = logsManagerAndroid" in you Application class.\nplease read README at https://github.com/jacek-marchwicki/logs-manager#configuration</string>
 </resources>

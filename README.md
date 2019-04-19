@@ -45,7 +45,9 @@ class MainApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        LogsSingleton.setup(LogsManagerAndroid(LogsManagerAndroidSettings(this, Log.VERBOSE)))
+        val logsManagerAndroid = LogsManagerAndroid(LogsManagerAndroidSettings(this, Log.VERBOSE))
+        LogsManagerAndroid.default = logsManagerAndroid
+        LogsSingleton.setup(logsManagerAndroid)
     }
 }
 ```
@@ -158,9 +160,15 @@ val fileContent = try {
 }
 ```
 
+# Development
 
-# To do
-- Check if Proguard removes all logging code
+Before doing pull-to-requests please ensure that following execution:
+
+```bash
+./gradlew ktlintFormat build connectedCheck
+```
+
+runs with `BUILD SUCCESSFUL`.
 
 # License
 
