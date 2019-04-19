@@ -17,13 +17,16 @@
 package com.jacekmarchwicki.logsmanager
 
 import android.util.Log
+import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
 import okhttp3.Response
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.SocketPolicy
 import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.equalTo
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThat
 import org.junit.Before
@@ -64,7 +67,7 @@ class LogsOkHttpInterceptorTest {
 
         assertThat(log.details, containsString(
             "CURL:\n" +
-                    "curl -X GET \"http://localhost:${mockWebServer.port}/base\"\n"))
+                    "curl 'http://localhost:${mockWebServer.port}/base'\n"))
 
         assertThat(log.details, containsString(
             "REQUEST:\n" +
@@ -93,7 +96,7 @@ class LogsOkHttpInterceptorTest {
 
         assertThat(log.details, containsString(
             "CURL:\n" +
-                    "curl -X GET \"http://localhost:${mockWebServer.port}/base\"\n"))
+                    "curl 'http://localhost:${mockWebServer.port}/base'\n"))
 
         assertThat(log.details, containsString(
             "REQUEST:\n" +
@@ -122,7 +125,7 @@ class LogsOkHttpInterceptorTest {
 
         assertThat(log.details, containsString(
             "CURL:\n" +
-                    "curl -X GET \"http://localhost:${mockWebServer.port}/base\"\n"))
+                    "curl 'http://localhost:${mockWebServer.port}/base'\n"))
 
         assertThat(log.details, containsString(
             "REQUEST:\n" +
@@ -154,7 +157,7 @@ class LogsOkHttpInterceptorTest {
 
         assertThat(log.details, containsString(
             "CURL:\n" +
-                "curl -X GET \"http://localhost:${mockWebServer.port}/base\"\n"))
+                "curl 'http://localhost:${mockWebServer.port}/base'\n"))
 
         assertThat(log.details, containsString(
             "REQUEST:\n" +
@@ -169,6 +172,60 @@ class LogsOkHttpInterceptorTest {
             "BODY:\n" +
                     "krowa\n" +
                     "(5-byte body)\n"))
+    }
+
+    @Test
+    fun `curl, when request is made, generate curl`() {
+        val request = Request.Builder()
+            .url("https://example.com/xyz")
+            .build()
+        val curl = LogsOkHttpInterceptor.CurlGenerator.toCurl(request, -1L)
+
+        assertThat(curl, equalTo("curl 'https://example.com/xyz'"))
+    }
+
+    @Test
+    fun `curl, when request with post made, generate curl`() {
+        val request = Request.Builder()
+            .post(RequestBody.create(MediaType.parse("application/json"), "{}"))
+            .url("https://example.com/xyz")
+            .build()
+        val curl = LogsOkHttpInterceptor.CurlGenerator.toCurl(request, -1L)
+
+        assertThat(curl, equalTo("curl -X POST -H 'Content-Type: application/json; charset=utf-8' -d '{}' 'https://example.com/xyz'"))
+    }
+
+    @Test
+    fun `curl, when request with plain text, generate curl`() {
+        val request = Request.Builder()
+            .put(RequestBody.create(MediaType.parse("plain/text"), "krowa"))
+            .url("https://example.com/xyz")
+            .build()
+        val curl = LogsOkHttpInterceptor.CurlGenerator.toCurl(request, -1L)
+
+        assertThat(curl, equalTo("curl -X PUT -H 'Content-Type: plain/text; charset=utf-8' -d krowa 'https://example.com/xyz'"))
+    }
+
+    @Test
+    fun `curl, when request with headers, generate curl`() {
+        val request = Request.Builder()
+            .addHeader("Header1", "Value1")
+            .addHeader("Header1", "Value2")
+            .url("https://example.com/xyz")
+            .build()
+        val curl = LogsOkHttpInterceptor.CurlGenerator.toCurl(request, -1L)
+
+        assertThat(curl, equalTo("curl -H 'Header1: Value1' -H 'Header1: Value2' 'https://example.com/xyz'"))
+    }
+
+    @Test
+    fun `curl, when request with long body, generate curl limited`() {val request = Request.Builder()
+        .put(RequestBody.create(MediaType.parse("plain/text"), "0123456789"))
+        .url("https://example.com/xyz")
+        .build()
+        val curl = LogsOkHttpInterceptor.CurlGenerator.toCurl(request, 4)
+
+        assertThat(curl, equalTo("curl -X PUT -H 'Content-Type: plain/text; charset=utf-8' -d '0123' 'https://example.com/xyz'"))
     }
 
     private fun executeRequest(): Response =

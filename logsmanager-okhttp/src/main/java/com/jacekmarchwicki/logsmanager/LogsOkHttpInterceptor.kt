@@ -16,16 +16,19 @@
 package com.jacekmarchwicki.logsmanager
 
 import android.util.Log
-import com.moczul.ok2curl.CurlBuilder
-import com.moczul.ok2curl.Options
 import okhttp3.Connection
 import okhttp3.Headers
 import okhttp3.Interceptor
+import okhttp3.MediaType
 import okhttp3.Request
+import okhttp3.RequestBody
 import okhttp3.Response
 import okhttp3.ResponseBody
 import okhttp3.internal.http.HttpHeaders
 import okio.Buffer
+import okio.Okio
+import okio.Sink
+import okio.Timeout
 import org.json.JSONObject
 import java.io.EOFException
 import java.io.IOException
@@ -35,6 +38,73 @@ import java.util.concurrent.TimeUnit
 
 class LogsOkHttpInterceptor constructor(private val logsManager: LogsManager, private val level: Int) : Interceptor {
 
+    class LimitedSink(private val limited: Buffer, private val total: Long) : Sink {
+
+        private var read = 0L
+
+        @Throws(IOException::class)
+        override fun write(source: Buffer, byteCount: Long) = if (total > 0) {
+            val left = total - read
+            val toWrite = Math.min(left, byteCount)
+            limited.write(source, toWrite)
+            read += toWrite
+
+        } else {
+            limited.write(source, byteCount)
+            read += byteCount
+        }
+        @Throws(IOException::class)
+        override fun flush() = limited.flush()
+        override fun timeout(): Timeout = limited.timeout()
+        @Throws(IOException::class)
+        override fun close() = limited.close()
+    }
+    internal object CurlGenerator {
+        fun toCurl(request: Request, limit: Long = -1L): String = toBash(toCurlArgs(request, limit))
+
+        private fun toCurlArgs(request: Request, limit: Long = -1L): List<String> = listOf(
+            listOf("curl"),
+            request.method().toUpperCase().let { if (it == "GET") listOf() else listOf("-X", it) },
+            request.headers().let { headers ->
+                (0 until headers.size()).map { headers.name(it) to headers.value(it) }.flatMap {
+                    listOf(
+                        "-H",
+                        "${it.first}: ${it.second}"
+                    )
+                }
+
+            },
+            request.body()?.contentType().let { if (it == null) listOf() else listOf("-H", "Content-Type: $it") },
+            request.body().let { if (it == null) listOf() else listOf("-d", getBodyAsString(it, limit)) },
+            listOf(request.url().toString())
+        ).flatten()
+
+        private val simpleParam = Regex("^[a-zA-Z-]+$")
+
+        private fun toBash(args: List<String>): String {
+            return args.joinToString(" ") {
+                if (simpleParam.matches(it))
+                    it
+                else "'${it.replace("\'", "\\\'")}'"
+            }
+        }
+
+
+        private fun getBodyAsString(body: RequestBody, limit: Long): String = try {
+            Buffer().use { sink ->
+                Okio.buffer(LimitedSink(sink, limit)).use { buffer ->
+                    body.writeTo(buffer)
+                    buffer.flush()
+                }
+                sink.readString(getCharset(body.contentType()))
+            }
+        } catch (e: Exception) {
+            "Error while reading body: $e"
+        }
+
+        private fun getCharset(mediaType: MediaType?): Charset = mediaType?.charset(null) ?: Charset.defaultCharset()
+    }
+
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response =
             if (logsManager.checkLevel(level)) {
@@ -43,7 +113,7 @@ class LogsOkHttpInterceptor constructor(private val logsManager: LogsManager, pr
                 val connection = chain.connection()
 
                 val title = "HTTP: ${request.method()} ${request.url()}"
-                val curl = CurlBuilder(request, 1024L * 1024L, listOf(), Options.EMPTY).build()
+                val curl = CurlGenerator.toCurl(request, 1024L * 100L)
                 val id = logsManager.logInstant(Log.INFO, "--- $title", "CURL:\n$curl\n\n\n")
                 logsManager.appendLogInstant(id, "REQUEST:\n${parseReqeuest(connection, request)}\n\n")
                 val startNs = System.nanoTime()
