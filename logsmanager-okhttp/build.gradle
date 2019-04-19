@@ -28,7 +28,6 @@ dependencies {
     implementation project(":logsmanager-base")
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "com.squareup.okhttp3:okhttp:3.12.1"
-    implementation 'com.github.mrmike:ok2curl:0.4.5'
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.hamcrest:java-hamcrest:2.0.0.0'
